@@ -22,13 +22,11 @@ const getUsuario = async (req, res) => {
 //  EDITAR PERFIL 
 const editarPerfil = async (req, res) => {
   try {
-    const { bio, readyPlayerMeUrl } = req.body
+    const { bio, avatarConfig } = req.body
 
-    // Solo permitimos editar estos campos desde aquí
-    // El avatar tiene su propio endpoint con Cloudinary
     const usuarioActualizado = await User.findByIdAndUpdate(
       req.user._id,
-      { bio, readyPlayerMeUrl },
+      { bio, avatarConfig },
       { new: true, runValidators: true }
     ).select('-password')
 
@@ -36,7 +34,6 @@ const editarPerfil = async (req, res) => {
       message: 'Perfil actualizado correctamente',
       user: usuarioActualizado
     })
-
   } catch (error) {
     res.status(500).json({ message: 'Error al editar el perfil', error: error.message })
   }

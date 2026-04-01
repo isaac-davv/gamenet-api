@@ -38,10 +38,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
-    readyPlayerMeUrl: {
-      type: String,
-      default: ''
-    },
+    avatarConfig: {
+      type: Object,
+      default: {
+        skinColor: '#FDBCB4',
+        hairColor: '#2C1810',
+        hairStyle: 'short',
+        clothesColor: '#E94560',
+        eyeColor: '#4A90D9'
+  }
+},
     followers: [
       {
         type: mongoose.Schema.Types.ObjectId,
