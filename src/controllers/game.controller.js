@@ -67,16 +67,24 @@ const crearJuego = async (req, res) => {
       return res.status(400).json({ message: 'Ya existe un juego con ese título' })
     }
 
+    // Busca la imagen en RAWG automáticamente
+    let coverImage = ''
+    try {
+      const rawgRes = await fetch(
+        `https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&search=${encodeURIComponent(title)}&page_size=1`
+      )
+      const rawgData = await rawgRes.json()
+      if (rawgData.results?.length > 0) {
+        coverImage = rawgData.results[0].background_image || ''
+      }
+    } catch {
+      console.log('No se pudo obtener imagen de RAWG')
+    }
+
     const nuevoJuego = await Game.create({
-      title,
-      genre,
-      platform,
-      year,
-      developer,
-      rating,
-      description,
-      // Si se sube imagen la cogemos de Cloudinary, si no se deja vacío
-      coverImage: req.file ? req.file.path : ''
+      title, genre, platform, year,
+      developer, rating, description,
+      coverImage: req.file ? req.file.path : coverImage
     })
 
     res.status(201).json({
@@ -88,7 +96,6 @@ const crearJuego = async (req, res) => {
     res.status(500).json({ message: 'Error al crear el juego', error: error.message })
   }
 }
-
 // ─── EDITAR JUEGO (admin) ────────────────────────────────────
 const editarJuego = async (req, res) => {
   try {
