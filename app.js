@@ -13,7 +13,12 @@ const app = express()
 connectDB()
 
 // Middlewares globales
-app.use(cors())
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://gamenet-client.vercel.app'
+  ]
+}))
 app.use(express.json())
 
 // Rutas
