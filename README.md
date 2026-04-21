@@ -20,6 +20,7 @@ Backend REST para GameNet, una red social para gamers. Desarrollado como proyect
 
 ## 📁 Estructura del proyecto
 
+```
 gamenet-api/
 ├── src/
 │   ├── config/          → Conexión MongoDB y Cloudinary
@@ -31,6 +32,7 @@ gamenet-api/
 │       └── data/        → CSVs con datos iniciales
 ├── app.js
 └── index.js
+```
 
 ## 🗄️ Modelos de datos
 
