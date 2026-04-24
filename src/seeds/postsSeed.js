@@ -24,14 +24,11 @@ const runSeed = async () => {
     await Post.deleteMany({})
     console.log('🗑️  Colección Posts limpiada')
 
-    // Para cada post buscamos el _id del usuario y del juego
-    // usando los datos del CSV (username y title)
     const postsFormateados = await Promise.all(
       posts.map(async (post) => {
         const user = await User.findOne({ username: post.author_username })
         const game = await Game.findOne({ title: post.game_title })
 
-        // Si no encuentra el usuario o el juego, lo saltamos
         if (!user || !game) {
           console.warn(`⚠️  No se encontró usuario o juego para el post: "${post.content.slice(0, 40)}..."`)
           return null
@@ -47,7 +44,6 @@ const runSeed = async () => {
       })
     )
 
-    // Filtramos los posts nulos (los que no encontraron usuario o juego)
     const postsValidos = postsFormateados.filter((post) => post !== null)
 
     await Post.insertMany(postsValidos)

@@ -14,7 +14,7 @@ const getPosts = async (req, res) => {
     const total = await Post.countDocuments(filtro)
 
     const posts = await Post.find(filtro)
-      .sort({ createdAt: -1 })  // los más recientes primero
+      .sort({ createdAt: -1 })  
       .skip(skip)
       .limit(Number(limit))
       .populate('author', 'username avatarUrl')
@@ -63,8 +63,6 @@ const crearPost = async (req, res) => {
       imageUrl: req.file ? req.file.path : ''
     })
 
-    // Populamos antes de devolver para que el frontend
-    // tenga todos los datos sin necesitar otra petición
     const postPopulado = await Post.findById(nuevoPost._id)
       .populate('author', 'username avatarUrl')
       .populate('game', 'title coverImage genre')
@@ -88,7 +86,6 @@ const editarPost = async (req, res) => {
       return res.status(404).json({ message: 'Post no encontrado' })
     }
 
-    // Solo el autor puede editar su post
     if (post.author.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'No tienes permiso para editar este post' })
     }
@@ -126,7 +123,6 @@ const eliminarPost = async (req, res) => {
       return res.status(404).json({ message: 'Post no encontrado' })
     }
 
-    // El autor o un admin pueden eliminar el post
     const esAutor = post.author.toString() === req.user._id.toString()
     const esAdmin = req.user.role === 'admin'
 
@@ -155,14 +151,12 @@ const darLike = async (req, res) => {
     const yaLeGusto = post.likes.includes(req.user._id)
 
     if (yaLeGusto) {
-      // Si ya le dio like, se lo quitamos (toggle)
       await Post.findByIdAndUpdate(req.params.id, {
         $pull: { likes: req.user._id }
       })
       return res.status(200).json({ message: 'Like eliminado' })
     }
 
-    // Si no le había dado like, lo añadimos
     await Post.findByIdAndUpdate(req.params.id, {
       $addToSet: { likes: req.user._id }
     })

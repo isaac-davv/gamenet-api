@@ -1,11 +1,10 @@
 const Game = require('../models/Game.model')
 
-// ─── GET JUEGOS ──────────────────────────────────────────────
+//GET JUEGOS
 const getJuegos = async (req, res) => {
   try {
     const { genre, platform, search, page = 1, limit = 20 } = req.query
 
-    // Construimos el filtro dinámicamente según los query params
     const filtro = {}
 
     if (genre) {
@@ -20,12 +19,11 @@ const getJuegos = async (req, res) => {
       filtro.title = { $regex: search, $options: 'i' }
     }
 
-    // Paginación
     const skip = (Number(page) - 1) * Number(limit)
     const total = await Game.countDocuments(filtro)
 
     const juegos = await Game.find(filtro)
-      .sort({ rating: -1 })   // ordenados por rating de mayor a menor
+      .sort({ rating: -1 })   
       .skip(skip)
       .limit(Number(limit))
 
@@ -41,7 +39,7 @@ const getJuegos = async (req, res) => {
   }
 }
 
-// ─── GET JUEGO ───────────────────────────────────────────────
+//GET JUEGO
 const getJuego = async (req, res) => {
   try {
     const juego = await Game.findById(req.params.id)
@@ -57,7 +55,7 @@ const getJuego = async (req, res) => {
   }
 }
 
-// ─── CREAR JUEGO (admin) ─────────────────────────────────────
+//CREAR JUEGO (admin)
 const crearJuego = async (req, res) => {
   try {
     const { title, genre, platform, year, developer, rating, description } = req.body
@@ -67,7 +65,6 @@ const crearJuego = async (req, res) => {
       return res.status(400).json({ message: 'Ya existe un juego con ese título' })
     }
 
-    // Busca la imagen en RAWG automáticamente
     let coverImage = ''
     try {
       const rawgRes = await fetch(
@@ -96,7 +93,7 @@ const crearJuego = async (req, res) => {
     res.status(500).json({ message: 'Error al crear el juego', error: error.message })
   }
 }
-// ─── EDITAR JUEGO (admin) ────────────────────────────────────
+//EDITAR JUEGO (admin)
 const editarJuego = async (req, res) => {
   try {
     const { title, genre, platform, year, developer, rating, description } = req.body
@@ -111,7 +108,6 @@ const editarJuego = async (req, res) => {
       description
     }
 
-    // Solo actualizamos la imagen si se sube una nueva
     if (req.file) {
       datosActualizados.coverImage = req.file.path
     }
@@ -136,7 +132,7 @@ const editarJuego = async (req, res) => {
   }
 }
 
-// ─── ELIMINAR JUEGO (admin) ──────────────────────────────────
+//ELIMINAR JUEGO (admin)
 const eliminarJuego = async (req, res) => {
   try {
     const juego = await Game.findByIdAndDelete(req.params.id)

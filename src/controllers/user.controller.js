@@ -42,13 +42,10 @@ const editarPerfil = async (req, res) => {
 //  SUBIR AVATAR 
 const subirAvatar = async (req, res) => {
   try {
-    // Si no viene ningún archivo en la petición
     if (!req.file) {
       return res.status(400).json({ message: 'No se ha subido ninguna imagen' })
     }
 
-    // req.file.path es la URL de Cloudinary que multer-storage-cloudinary
-    // genera automáticamente después de subir la imagen
     const usuarioActualizado = await User.findByIdAndUpdate(
       req.user._id,
       { avatarUrl: req.file.path },
@@ -74,22 +71,18 @@ const seguirUsuario = async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado' })
     }
 
-    // No puedes seguirte a ti mismo
     if (req.params.id === req.user._id.toString()) {
       return res.status(400).json({ message: 'No puedes seguirte a ti mismo' })
     }
 
-    // Comprobamos si ya le sigue
     if (usuarioAseguir.followers.includes(req.user._id)) {
       return res.status(400).json({ message: 'Ya sigues a este usuario' })
     }
 
-    // Añadimos el id del usuario logueado a los followers del otro
     await User.findByIdAndUpdate(req.params.id, {
       $addToSet: { followers: req.user._id }
     })
 
-    // Añadimos el id del otro a los following del usuario logueado
     await User.findByIdAndUpdate(req.user._id, {
       $addToSet: { following: req.params.id }
     })
@@ -110,17 +103,14 @@ const dejarDeSeguir = async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado' })
     }
 
-    // Comprobamos si realmente le sigue
     if (!usuarioAdejarDeSeguir.followers.includes(req.user._id)) {
       return res.status(400).json({ message: 'No sigues a este usuario' })
     }
 
-    // Eliminamos el id del usuario logueado de los followers del otro
     await User.findByIdAndUpdate(req.params.id, {
       $pull: { followers: req.user._id }
     })
 
-    // Eliminamos el id del otro de los following del usuario logueado
     await User.findByIdAndUpdate(req.user._id, {
       $pull: { following: req.params.id }
     })

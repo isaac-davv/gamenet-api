@@ -23,8 +23,6 @@ const runSeed = async () => {
     await User.deleteMany({})
     console.log('🗑️  Colección Users limpiada')
 
-    // Encriptamos cada contraseña manualmente porque insertMany
-    // no ejecuta el hook pre('save') del modelo
     const usersFormateados = await Promise.all(
       users.map(async (user) => ({
         username: user.username,

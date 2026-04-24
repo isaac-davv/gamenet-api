@@ -1,7 +1,7 @@
 const User = require('../models/User.model')
 const jwt = require('jsonwebtoken')
 
-// ─── REGISTER ───────────────────────────────────────────────
+//REGISTER
 const register = async (req, res) => {
   try {
     const { username, email, password } = req.body
@@ -17,8 +17,6 @@ const register = async (req, res) => {
       return res.status(400).json({ message: 'Ese email ya está registrado' })
     }
 
-    // Creamos el usuario — la contraseña se encripta sola
-    // gracias al hook pre('save') que definimos en el modelo
     const nuevoUsuario = await User.create({ username, email, password })
 
     // Generamos el token JWT
@@ -46,24 +44,21 @@ const register = async (req, res) => {
   }
 }
 
-// ─── LOGIN ───────────────────────────────────────────────────
+//LOGIN
 const login = async (req, res) => {
   try {
     const { email, password } = req.body
 
-    // Buscamos el usuario por email
     const user = await User.findOne({ email })
     if (!user) {
       return res.status(401).json({ message: 'Credenciales incorrectas' })
     }
 
-    // Comparamos la contraseña usando el método del modelo
     const passwordCorrecta = await user.comparePassword(password)
     if (!passwordCorrecta) {
       return res.status(401).json({ message: 'Credenciales incorrectas' })
     }
 
-    // Generamos el token JWT
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
@@ -88,11 +83,9 @@ const login = async (req, res) => {
   }
 }
 
-// ─── GET ME ──────────────────────────────────────────────────
+//GET ME
 const getMe = async (req, res) => {
   try {
-    // req.user ya existe gracias al middleware isAuthenticated
-    // Solo lo devolvemos con populate de followers y following
     const user = await User.findById(req.user._id)
       .select('-password')
       .populate('followers', 'username avatarUrl')
